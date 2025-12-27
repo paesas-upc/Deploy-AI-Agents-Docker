@@ -12,5 +12,4 @@ class ChatMessage(SQLModel, table=True): # type: ignore
     # saving, updating, getting, deleting
     # serializer
     id: int | None = Field(default=None, primary_key=True) # 1, 2, 3, 4...
-    name: str
     message: str

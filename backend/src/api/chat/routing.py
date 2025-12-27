@@ -14,14 +14,14 @@ def chat_health():
 @router.get("/recent/")
 def chat_list_messages(session: Session = Depends(get_session)):
     query = select(ChatMessage) # sql -> query
-    results = session.exec().fetchall()[:10]
+    results = session.exec(query).fetchall()[:10]
     return results
 
-# HTTP POST -> payload = {"message":"Hello world!"} -> {"message": "hello world", "id": 1}
-# curl -X POST -d '{"message":"Hello world!"}' -H "Content-Type: application/json" http://localhost:8080/api/chats/
+# HTTP POST -> payload = {"message":"Hello world"} -> {"message": "hello world", "id": 1}
+# curl -X POST -d '{"message":"Hello world"}' -H "Content-Type: application/json" http://localhost:8080/api/chats/
 @router.post("/", response_model=ChatMessage)
 def chat_create_message(
-    payload:ChatMessagePayload,
+    payload: ChatMessagePayload,
     session: Session = Depends(get_session) 
     ):
     data = payload.model_dump() # pydantic -> dict
