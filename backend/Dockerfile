@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3.13.4-slim-bullseye
 
 # host.docker.internal -> localhost
 # curl -X POST -d '{"message":"Hello world!"}' -H "Content-Type: application/json" http://localhost:8080/api/chats/
