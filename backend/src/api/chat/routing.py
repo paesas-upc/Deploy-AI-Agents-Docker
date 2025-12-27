@@ -22,9 +22,9 @@ def chat_list_messages(session: Session = Depends(get_session)):
 
 # HTTP POST -> payload = {"message":"Hello world"} -> {"message": "hello world", "id": 1}
 # curl.exe -X POST -H "Content-Type: application/json" -d '{\"message\": \"Hello world\"}' http://localhost:8080/api/chats/
-# curl.exe -X POST -H "Content-Type: application/json" -d '{\"message\": \"Hello world\"}'  https://ai-agents-docker-production.up.railway.app/api/chats/
+# curl.exe -X POST -H "Content-Type: application/json" -d '{\"message\": \"Hello world\"}' https://ai-agents-docker-production.up.railway.app/api/chats/
 
-#  curl.exe -X POST http://localhost:8080/api/chats/ -H "Content-Type: application/json" -d '{\"message\": \" Give me a summary of why it is good to go outside\"}' 
+#  curl.exe -X POST -H "Content-Type: application/json" -d '{\"message\": \" Give me a summary of why it is good to go outside\"} 'https://ai-agents-docker-production.up.railway.app/api/chats/
 @router.post("/", response_model=EmailMessageSchema)
 def chat_create_message(
     payload: ChatMessagePayload,
