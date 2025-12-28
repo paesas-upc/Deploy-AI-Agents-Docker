@@ -19,7 +19,7 @@
 ### Overview
 This repository (**paesas-upc/Deploy-AI-Agents-Docker**) focuses on showing how a **multi-agent AI system** can be packaged and deployed as a real service using modern tooling. The key idea is to expose an agent pipeline through an HTTP API so it can be triggered remotely (not only from a local script).
 
-At a high level, a client sends a request to the API, the backend runs the multi-agent workflow, and the system returns a structured response. A database can be used to persist messages/events.
+At a high level, a client sends a request to the API, the backend runs the multi-agent workflow, and the system returns a structured response. A database is used to persist messages/events.
 
 ### Tools used
 
@@ -39,7 +39,7 @@ At a high level, a client sends a request to the API, the backend runs the multi
 Together, they enable a system where different agents can cooperate (research + messaging/email actions) instead of using a single monolithic prompt.
 
 #### PostgreSQL (Persistence)
-**PostgreSQL** is used to persist chat messages or other events produced by the API. Storing messages in a database is useful for auditing, debugging, analytics, and building UI features like “recent conversations”.
+**PostgreSQL** is used to save chat messages or other events produced by the API. Storing messages in a database is useful for auditing, debugging, analytics, and building UI features like “recent conversations”.
 
 ### Architecture (High Level)
 1. A user/client sends an HTTP request to the deployed API.
@@ -64,7 +64,7 @@ All of this is exposed through a **FastAPI** HTTP endpoint, **containerized with
 ### Descripción general
 Este repositorio (**paesas-upc/Deploy-AI-Agents-Docker**) se centra en mostrar cómo empaquetar y desplegar un **sistema multi-agente de IA** como un servicio real utilizando herramientas modernas. La idea clave es exponer el pipeline de agentes mediante una API HTTP para poder ejecutarlo remotamente (no solo como un script local).
 
-A alto nivel, un cliente envía una petición a la API, el backend ejecuta el flujo multi-agente y el sistema devuelve una respuesta estructurada. También puede usarse una base de datos para persistir mensajes/eventos.
+A alto nivel, un cliente envía una petición a la API, el backend ejecuta el flujo multi-agente y el sistema devuelve una respuesta estructurada. También se usa una base de datos para persistir mensajes/eventos.
 
 ### Herramientas utilizadas
 
@@ -84,7 +84,7 @@ A alto nivel, un cliente envía una petición a la API, el backend ejecuta el fl
 Juntos permiten que diferentes agentes cooperen (por ejemplo, investigación + acciones de mensajería/email) en lugar de depender de un único prompt monolítico.
 
 #### PostgreSQL (Persistencia)
-**PostgreSQL** se utiliza para persistir mensajes del chat u otros eventos generados por la API. Guardar mensajes en base de datos es útil para auditoría, depuración, analítica y para construir funcionalidades de UI como “conversaciones recientes”.
+**PostgreSQL** se utiliza para guardar mensajes del chat u otros eventos generados por la API. Guardar mensajes en base de datos es útil para auditoría, depuración, analítica y para construir funcionalidades de UI como “conversaciones recientes”.
 
 ### Arquitectura (Alto nivel)
 1. Un usuario/cliente envía una petición HTTP a la API desplegada.
