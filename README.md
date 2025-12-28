@@ -1,8 +1,8 @@
-# AI Agents (Docker) — FastAPI + Multi-Agent Supervisor (EN/ES)
+# Deploy AI Agents with Docker — FastAPI + Multi-Agent Supervisor
 
-> **Credits / Attribution (Very Important)**
+> **Credits / Attribution**
 >
-> This repository (**paesas-upc/AI-agents-docker**) is a replication/adaptation of the original project:
+> This repository is a replication/adaptation of the original project:
 > **@codingforentrepreneurs/build-deploy-ai-agent-python-docker**  
 > https://github.com/codingforentrepreneurs/build-deploy-ai-agent-python-docker
 >
@@ -17,165 +17,92 @@
 ## English
 
 ### Overview
-This project demonstrates how to build and run a **multi-agent AI system** behind a **FastAPI** web API, packaged with **Docker** and orchestrated with **Docker Compose**.
+This repository (**paesas-upc/Deploy-AI-Agents-Docker**) focuses on showing how a **multi-agent AI system** can be packaged and deployed as a real service using modern tooling. The key idea is to expose an agent pipeline through an HTTP API so it can be triggered remotely (not only from a local script).
 
-Main components:
-- **FastAPI** backend exposing endpoints like `POST /api/chats/`
-- **Multi-agent supervisor** (LangGraph/LangChain style) that can route tasks to specialized agents
-- **Email tools** (send an email to the configured address; read inbox)
-- **PostgreSQL** database to store chat messages
+At a high level, a client sends a request to the API, the backend runs the multi-agent workflow, and the system returns a structured response. A database can be used to persist messages/events.
+
+### Tools used
+
+#### Docker (Containerization)
+**Docker** packages the application and its dependencies into a **container image** so it runs consistently across environments (local machine, cloud, CI/CD). This is especially helpful for multi-service setups where you want repeatable builds and predictable runtime behavior.
+
+#### FastAPI (HTTP API Layer)
+**FastAPI** is the Python web framework that exposes the project’s functionality as **HTTP endpoints** (for example, a `POST` endpoint to submit a user message). It acts as the “entry point” to trigger the agent pipeline from any client that can make HTTP requests.
+
+#### Railway (Deployment Platform)
+**Railway** is a hosting/deployment platform where we run our containerized application in the cloud. When deployed, requests from users are executed on **Railway’s infrastructure**, using the environment configuration defined in Railway, and the API response is returned to the user over HTTP.
+
+#### LangChain + LangGraph (Agents + Orchestration)
+- **LangChain** provides building blocks for LLM apps (models, tools, tool-calling patterns, prompt flows).
+- **LangGraph** (and the supervisor pattern used here) helps orchestrate **multiple agents**: a “supervisor” routes tasks to specialized agents/tools to complete a request.
+
+Together, they enable a system where different agents can cooperate (research + messaging/email actions) instead of using a single monolithic prompt.
+
+#### PostgreSQL (Persistence)
+**PostgreSQL** is used to persist chat messages or other events produced by the API. Storing messages in a database is useful for auditing, debugging, analytics, and building UI features like “recent conversations”.
 
 ### Architecture (High Level)
-1. A client sends an HTTP request to the backend (e.g., using `curl`).
-2. FastAPI validates the request payload.
-3. The message is stored in Postgres.
-4. The supervisor agent runs and may call tools (research, send email, read inbox).
-5. The final response is returned as JSON.
+1. A user/client sends an HTTP request to the deployed API.
+2. FastAPI receives and validates the request payload.
+3. The message can be persisted to PostgreSQL.
+4. A multi-agent supervisor runs and may delegate tasks to specialized agents/tools.
+5. The final result is returned to the client as an HTTP response.
 
-### Requirements
-- Docker + Docker Compose
-- An OpenAI-compatible API key (or a compatible LLM endpoint, depending on your configuration)
-- (Optional) Email credentials (app password recommended if using Gmail)
+### Final behavior
+Depending on the user prompt, this project can execute an end-to-end **agent pipeline** with real-world side effects:
 
-### Environment variables
-This repo uses environment variables for configuration (API keys, DB URL, email settings). A template file exists:
+- A **Research Agent** uses the LLM to gather/compose information about a topic requested by the user.
+- An **Email Agent** can send the resulting summary as an email.
+- A **Supervisor** (LangGraph) orchestrates and routes work between these agents.
 
-- `.env.sample` (template)
-
-**Important note:** In `compose.yaml`, the backend currently loads environment variables from `.env.sample` via `env_file`.  
-For real usage, it’s recommended to create your own `.env` (not committed) and point Compose to that instead.
-
-Typical variables used:
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL_NAME`
-- `DATABASE_URL`
-- `EMAIL_ADDRESS`
-- `EMAIL_PASSWORD` (use an app password; do not use your real password)
-- `EMAIL_HOST`
-- `EMAIL_PORT`
-
-### Run locally (Docker Compose)
-From the repo root:
-
-```bash
-docker compose up --build
-```
-
-Backend will be available at:
-- http://localhost:8080
-
-### Test the API
-Health check:
-```bash
-curl http://localhost:8080/api/chats/
-```
-
-Create a message (triggers the agent supervisor):
-```bash
-curl -X POST -H "Content-Type: application/json" \
-  -d "{\"message\": \"Hello world\"}" \
-  http://localhost:8080/api/chats/
-```
-
-Recent messages:
-```bash
-curl http://localhost:8080/api/chats/recent/
-```
-
-### About the “email me the results” behavior
-The “send email” tool sends to the configured environment variable `EMAIL_ADDRESS` by default (i.e., “send to myself” behavior).  
-If you deploy this publicly, add authentication/rate-limiting to prevent abuse and unexpected costs.
-
-### Deployment (Concept)
-This project is designed to be deployable on platforms that support Docker-based deployments (e.g., Railway). In a hosted deployment:
-- The code runs on the platform’s infrastructure
-- Requests hit the public URL
-- Environment variables are set on the platform (not on the user’s computer)
+All of this is exposed through a **FastAPI** HTTP endpoint, **containerized with Docker**, and **deployed on Railway** so that any client can trigger the workflow remotely via an HTTP request.
 
 ---
 
 ## Español
 
 ### Descripción general
-Este proyecto demuestra cómo construir y ejecutar un **sistema multi-agente de IA** detrás de una API web con **FastAPI**, empaquetado con **Docker** y orquestado con **Docker Compose**.
+Este repositorio (**paesas-upc/Deploy-AI-Agents-Docker**) se centra en mostrar cómo empaquetar y desplegar un **sistema multi-agente de IA** como un servicio real utilizando herramientas modernas. La idea clave es exponer el pipeline de agentes mediante una API HTTP para poder ejecutarlo remotamente (no solo como un script local).
 
-Componentes principales:
-- Backend **FastAPI** que expone endpoints como `POST /api/chats/`
-- **Supervisor multi-agente** (estilo LangGraph/LangChain) que delega tareas en agentes especializados
-- **Herramientas de email** (enviar un email a la dirección configurada; leer la bandeja de entrada)
-- Base de datos **PostgreSQL** para almacenar mensajes del chat
+A alto nivel, un cliente envía una petición a la API, el backend ejecuta el flujo multi-agente y el sistema devuelve una respuesta estructurada. También puede usarse una base de datos para persistir mensajes/eventos.
+
+### Herramientas utilizadas
+
+#### Docker (Contenerización)
+**Docker** empaqueta la aplicación y sus dependencias en una **imagen de contenedor** para que se ejecute de forma consistente en distintos entornos (local, cloud, CI/CD). Esto es especialmente útil en arquitecturas con varios servicios, donde se busca reproducibilidad y comportamiento predecible.
+
+#### FastAPI (Capa de API HTTP)
+**FastAPI** es el framework web en Python que expone la funcionalidad del proyecto como **endpoints HTTP** (por ejemplo, un `POST` para enviar un mensaje del usuario). Actúa como “puerta de entrada” para disparar el pipeline de agentes desde cualquier cliente capaz de hacer peticiones HTTP.
+
+#### Railway (Plataforma de despliegue)
+**Railway** es una plataforma de hosting/despliegue donde ejecutamos nuestra aplicación contenerizada en la nube. Una vez desplegada, las peticiones de los usuarios se ejecutan en la **infraestructura de Railway**, utilizando la configuración de entorno definida en Railway, y la respuesta de la API se devuelve al usuario a través de HTTP.
+
+#### LangChain + LangGraph (Agentes + Orquestación)
+- **LangChain** aporta componentes para construir aplicaciones con LLM (modelos, herramientas, tool-calling, flujos de prompts).
+- **LangGraph** (y el patrón de supervisor usado aquí) ayuda a orquestar **múltiples agentes**: un “supervisor” reparte tareas entre agentes/herramientas especializadas.
+
+Juntos permiten que diferentes agentes cooperen (por ejemplo, investigación + acciones de mensajería/email) en lugar de depender de un único prompt monolítico.
+
+#### PostgreSQL (Persistencia)
+**PostgreSQL** se utiliza para persistir mensajes del chat u otros eventos generados por la API. Guardar mensajes en base de datos es útil para auditoría, depuración, analítica y para construir funcionalidades de UI como “conversaciones recientes”.
 
 ### Arquitectura (Alto nivel)
-1. Un cliente envía una petición HTTP al backend (por ejemplo con `curl`).
-2. FastAPI valida el payload de entrada.
-3. El mensaje se guarda en Postgres.
-4. El supervisor ejecuta el flujo multi-agente y puede llamar herramientas (investigación, enviar email, leer inbox).
-5. Se devuelve la respuesta final en JSON.
+1. Un usuario/cliente envía una petición HTTP a la API desplegada.
+2. FastAPI recibe y valida el payload.
+3. El mensaje puede persistirse en PostgreSQL.
+4. Se ejecuta un supervisor multi-agente que puede delegar tareas a agentes/herramientas especializadas.
+5. El resultado final se devuelve al cliente como respuesta HTTP.
 
-### Requisitos
-- Docker + Docker Compose
-- Una API key compatible con OpenAI (o un endpoint LLM compatible, según tu configuración)
-- (Opcional) Credenciales de email (se recomienda app password si usas Gmail)
+### Comportamiento final
+Dependiendo del prompt del usuario, este proyecto puede ejecutar un **pipeline de agentes** de extremo a extremo con efectos reales:
 
-### Variables de entorno
-Este repo usa variables de entorno para configuración (API keys, DB URL, email). Existe un archivo plantilla:
+- Un **Agente de investigación (Research Agent)** utiliza el LLM para recopilar/crear información sobre un tema solicitado por el usuario.
+- Un **Agente de email (Email Agent)** puede enviar por correo electrónico el resumen resultante.
+- Un **Supervisor** (LangGraph) orquesta y enruta el trabajo entre estos agentes.
 
-- `.env.sample` (plantilla)
-
-**Nota importante:** En `compose.yaml`, el backend carga variables desde `.env.sample` mediante `env_file`.  
-Para uso real, se recomienda crear tu propio `.env` (no versionado) y apuntar Compose a ese archivo.
-
-Variables típicas:
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL_NAME`
-- `DATABASE_URL`
-- `EMAIL_ADDRESS`
-- `EMAIL_PASSWORD` (usa app password; no uses tu contraseña real)
-- `EMAIL_HOST`
-- `EMAIL_PORT`
-
-### Ejecutar en local (Docker Compose)
-Desde la raíz del repo:
-
-```bash
-docker compose up --build
-```
-
-El backend estará disponible en:
-- http://localhost:8080
-
-### Probar la API
-Health check:
-```bash
-curl http://localhost:8080/api/chats/
-```
-
-Crear un mensaje (dispara el supervisor multi-agente):
-```bash
-curl -X POST -H "Content-Type: application/json" \
-  -d "{\"message\": \"Hola mundo\"}" \
-  http://localhost:8080/api/chats/
-```
-
-Mensajes recientes:
-```bash
-curl http://localhost:8080/api/chats/recent/
-```
-
-### Sobre el comportamiento “envíame un email con los resultados”
-La herramienta de envío de email envía por defecto a la variable `EMAIL_ADDRESS` (comportamiento tipo “enviarme a mí mismo”).  
-Si despliegas esto públicamente, añade autenticación y/o rate-limiting para evitar abusos y costes inesperados.
-
-### Despliegue (Concepto)
-Este proyecto está pensado para desplegarse en plataformas que soporten Docker (por ejemplo Railway). En un despliegue hospedado:
-- El código se ejecuta en la infraestructura de la plataforma
-- Las peticiones van a una URL pública
-- Las variables de entorno se configuran en la plataforma (no en el ordenador del usuario)
+Todo esto se expone mediante un endpoint HTTP de **FastAPI**, se **conteneriza con Docker** y se **despliega en Railway**, de modo que cualquier cliente pueda disparar el flujo de trabajo remotamente mediante una petición HTTP.
 
 ---
-
-## License
-Check this repository’s license (if present). If no license is included, assume default copyright rules apply.
 
 ## Acknowledgements
 - Original repository: https://github.com/codingforentrepreneurs/build-deploy-ai-agent-python-docker
