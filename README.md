@@ -1,4 +1,3 @@
-````markdown name=README.md
 # AI Agents (Docker) — FastAPI + Multi-Agent Supervisor (EN/ES)
 
 > **Credits / Attribution (Very Important)**
@@ -181,4 +180,3 @@ Check this repository’s license (if present). If no license is included, assum
 ## Acknowledgements
 - Original repository: https://github.com/codingforentrepreneurs/build-deploy-ai-agent-python-docker
 - Tutorial: https://www.youtube.com/watch?v=KC8HT0eWSGk
-````
